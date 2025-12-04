@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApprovalController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\SignedRegisterController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Http\Request;
@@ -37,3 +38,11 @@ Route::post('/registerwah', [SignedRegisterController::class, 'askForRegister'])
 Route::post('/verify-email/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
+
+Route::post('/login', [AuthenticatedSessionController::class, 'storeMobile'])
+    ->middleware('guest')
+    ->name('login');
+
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroyMobilr'])
+    ->middleware('auth')
+    ->name('logout');
