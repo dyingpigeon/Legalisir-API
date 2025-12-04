@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Permohonan;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePermohonanRequest;
+use App\Http\Resources\PermohonanResource;
 use App\Http\Requests\UpdatePermohonanRequest;
 
 class PermohonanController extends Controller
@@ -11,9 +14,51 @@ class PermohonanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = Permohonan::query();
+        $query = Permohonan::with(['user']);
+
+        // Filter untuk pencarian (gunakan LIKE)
+        if ($request->has('keperluan')) {
+            $query->where('keperluan', 'like', '%' . $request->keperluan . '%');
+        }
+
+        if ($request->has('file')) {
+            $query->where('file', 'like', '%' . $request->file . '%');
+        }
+
+        // Filter untuk exact match (gunakan = bukan LIKE)
+        if ($request->has('user')) {
+            $query->where('user_id', $request->user);  // Exact match
+        }
+
+        if ($request->has('username')) {
+            $query->where('username', $request->username);  // Exact match
+        }
+
+        if ($request->has('nomor_ijazah')) {
+            $query->where('nomor_ijazah', $request->nomor_ijazah);  // Exact match
+        }
+
+        if ($request->has('jumlah_lembar')) {
+            $query->where('jumlah_lembar', $request->jumlah_lembar);  // Exact match
+        }
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);  // Exact match
+        }
+
+        // Filter berdasarkan tanggal
+        if ($request->has('created_at')) {
+            $query->whereDate('created_at', $request->created_at);
+        }
+
+        if ($request->has('tanggal_diambil')) {
+            $query->whereDate('tanggal_diambil', $request->tanggal_diambil);
+        }
+
+        return \App\Http\Resources\PermohonanResource::collection($query->paginate(10));
     }
 
     /**
@@ -29,7 +74,7 @@ class PermohonanController extends Controller
      */
     public function store(StorePermohonanRequest $request)
     {
-        //
+        return new PermohonanResource(Permohonan::create($request->all()));
     }
 
     /**
@@ -37,15 +82,8 @@ class PermohonanController extends Controller
      */
     public function show(Permohonan $permohonan)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Permohonan $permohonan)
-    {
-        //
+        $permohonan->load(['user']);
+        return new PermohonanResource($permohonan);
     }
 
     /**
@@ -53,14 +91,21 @@ class PermohonanController extends Controller
      */
     public function update(UpdatePermohonanRequest $request, Permohonan $permohonan)
     {
-        //
+        $permohonan->update($request->all());
+        return new PermohonanResource($permohonan);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Permohonan $permohonan)
+    public function destroy($id)
     {
-        //
+        $permohonan = Permohonan::findOrFail($id);
+        $permohonan->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permohonan berhasil dihapus',
+        ], 200);
     }
 }
