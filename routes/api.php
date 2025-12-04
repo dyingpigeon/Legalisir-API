@@ -11,38 +11,56 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::prefix('approval')->group(function () {
-    Route::post('/operator/{id}', [ApprovalController::class, 'approveByOperator']);
-    Route::post('/wadir/{id}', [ApprovalController::class, 'approveByWadir']);
-    Route::post('/sign/{id}', [ApprovalController::class, 'markAsSigned']);
-    Route::post('/ready/{id}', [ApprovalController::class, 'markAsReady']);
-    Route::post('/reject/{id}', [ApprovalController::class, 'reject']);
-    Route::get('/riwayat/{permohonanId}', [ApprovalController::class, 'getRiwayat']);
-    Route::get('/permohonan', [ApprovalController::class, 'getPermohonanByStatus']);
+// Public routes (tanpa authentication)
+Route::middleware(['guest'])->group(function () {
+    Route::post('/login', [AuthenticatedSessionController::class, 'storeMobile'])->name('login');
+    Route::post('/registerwah', [SignedRegisterController::class, 'askForRegister'])->name('register');
+
+    // Verify email - biasanya public karena diakses via link email
+    Route::post('/verify-email/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
 });
 
-Route::apiResource('/permohonan', \App\Http\Controllers\PermohonanController::class);
-Route::apiResource('/riwayat-status', \App\Http\Controllers\RiwayatStatusController::class);
-Route::apiResource('/ijazah', \App\Http\Controllers\IjazahController::class);
-Route::apiResource('/operator', \App\Http\Controllers\OperatorController::class);
-Route::apiResource('/data-alumni', \App\Http\Controllers\DataAlumniController::class);
-Route::post('/data-alumni/search', [\App\Http\Controllers\DataAlumniController::class, 'search']);
-Route::get('/data-alumni/debug-search', [\App\Http\Controllers\DataAlumniController::class, 'debugSearch']); // untuk debugging
-Route::get('/test-log', [\App\Http\Controllers\DataAlumniController::class, 'testLog']);
+Route::post('/refresh', [AuthenticatedSessionController::class, 'refresh'])
+    ->middleware('guest') // Butuh valid token untuk refresh
+    ->name('token.refresh');
 
+// Protected routes dengan sanctum
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Token refresh - butuh token yang valid
 
-Route::post('/registerwah', [SignedRegisterController::class, 'askForRegister'])
-    ->middleware('guest')
-    ->name('register');
+    // Logout
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroyMobile'])->name('logout');
 
-Route::post('/verify-email/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
-    ->middleware(['signed', 'throttle:6,1'])
-    ->name('verification.verify');
+    // Approval routes
+    Route::prefix('approval')->group(function () {
+        Route::post('/operator/{id}', [ApprovalController::class, 'verifiedByOperator']);
+        Route::post('/wadir/{id}', [ApprovalController::class, 'signedByWadir']);
+        // Route::post('/sign/{id}', [ApprovalController::class, 'markAsSigned']);
+        Route::post('/ready/{id}', [ApprovalController::class, 'markAsReady']);
+        Route::post('/reject/{id}', [ApprovalController::class, 'reject']);
+        Route::get('/riwayat/{permohonanId}', [ApprovalController::class, 'getRiwayat']);
+        Route::get('/permohonan', [ApprovalController::class, 'getPermohonanByStatus']);
+    });
 
-Route::post('/login', [AuthenticatedSessionController::class, 'storeMobile'])
-    ->middleware('guest')
-    ->name('login');
+    Route::post('/permohonan-debug', function (Request $request) {
+        return response()->json([
+            'message' => 'Debug route works',
+            'user' => $request->user(),
+            'auth' => auth()->check()
+        ]);
+    });
 
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroyMobilr'])
-    ->middleware('auth')
-    ->name('logout');
+    // API Resources
+    Route::apiResource('/permohonan', \App\Http\Controllers\PermohonanController::class);
+    Route::apiResource('/riwayat-status', \App\Http\Controllers\RiwayatStatusController::class);
+    Route::apiResource('/ijazah', \App\Http\Controllers\IjazahController::class);
+    Route::apiResource('/operator', \App\Http\Controllers\OperatorController::class);
+
+    // Data Alumni routes
+    Route::apiResource('/data-alumni', \App\Http\Controllers\DataAlumniController::class);
+    Route::post('/data-alumni/search', [\App\Http\Controllers\DataAlumniController::class, 'search']);
+    Route::get('/data-alumni/debug-search', [\App\Http\Controllers\DataAlumniController::class, 'debugSearch']);
+    Route::get('/test-log', [\App\Http\Controllers\DataAlumniController::class, 'testLog']);
+});

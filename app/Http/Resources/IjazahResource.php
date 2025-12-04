@@ -14,6 +14,13 @@ class IjazahResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'nomorIjazah' => $this->nomor_ijazah,
+            'nim' => $this->nim,
+            'pathFile' => $this->path_file,
+            'createdAt' => $this->created_at,
+            'updatedAt' => $this->updated_at,
+        ];
     }
 }

@@ -14,6 +14,14 @@ class OperatorResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'nip' => $this->nip,
+            'nik' => $this->nik,
+            'nama' => $this->nama,
+            'jk' => $this->jk,
+            'createdAt' => $this->created_at,
+            'updatedAt' => $this->updated_at,
+        ];
     }
 }

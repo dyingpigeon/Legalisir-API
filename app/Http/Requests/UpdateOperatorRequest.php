@@ -11,7 +11,7 @@ class UpdateOperatorRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +21,28 @@ class UpdateOperatorRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        $method = $this->method();
+
+        if ($method == 'PUT') {
+            return [
+                'nip' => ['required', 'integer', 'unique:operators,nip,' . $this->operator->id],
+                'nik' => ['required', 'integer', 'unique:operators,nik,' . $this->operator->id],
+                'nama' => ['required', 'string', 'max:255'],
+                'jk' => ['required', 'in:laki-laki,perempuan'],
+            ];
+        } else {
+            return [
+                'nip' => ['sometimes', 'integer', 'unique:operators,nip,' . $this->operator->id],
+                'nik' => ['sometimes', 'integer', 'unique:operators,nik,' . $this->operator->id],
+                'nama' => ['sometimes', 'string', 'max:255'],
+                'jk' => ['sometimes', 'in:laki-laki,perempuan'],
+            ];
+        }
+    }
+
+    protected function prepareForValidation()
+    {
+        // Tidak perlu prepareForValidation karena field name sudah sama
+        // dengan database column name
     }
 }

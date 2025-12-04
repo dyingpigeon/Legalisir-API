@@ -11,7 +11,7 @@ class StoreIjazahRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,17 @@ class StoreIjazahRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nomorIjazah' => 'required|integer|unique:ijazahs,nomor_ijazah',
+            'nim' => 'required|integer',
+            'pathFile' => 'required|string',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'nomor_ijazah' => $this->nomorIjazah,
+            'path_file' => $this->pathFile,
+        ]);
     }
 }

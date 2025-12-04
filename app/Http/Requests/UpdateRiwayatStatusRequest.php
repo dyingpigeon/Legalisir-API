@@ -11,7 +11,7 @@ class UpdateRiwayatStatusRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +21,40 @@ class UpdateRiwayatStatusRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        $method = $this->method();
+
+        if ($method == 'PUT') {
+            return [
+                'permohonanId' => ['required', 'integer', 'exists:permohonans,id'],
+                'userId' => ['required', 'integer', 'exists:users,id'],
+                'statusSebelum' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:5'],
+                'statusSesudah' => ['required', 'integer', 'min:1', 'max:5'],
+                'keterangan' => ['sometimes', 'nullable', 'string'],
+            ];
+        } else {
+            return [
+                'permohonanId' => ['sometimes', 'integer', 'exists:permohonans,id'],
+                'userId' => ['sometimes', 'integer', 'exists:users,id'],
+                'statusSebelum' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:5'],
+                'statusSesudah' => ['sometimes', 'integer', 'min:1', 'max:5'],
+                'keterangan' => ['sometimes', 'nullable', 'string'],
+            ];
+        }
+    }
+
+    protected function prepareForValidation()
+    {
+        if ($this->has('permohonanId')) {
+            $this->merge(['permohonan_id' => $this->permohonanId]);
+        }
+        if ($this->has('userId')) {
+            $this->merge(['user_id' => $this->userId]);
+        }
+        if ($this->has('statusSebelum')) {
+            $this->merge(['status_sebelum' => $this->statusSebelum]);
+        }
+        if ($this->has('statusSesudah')) {
+            $this->merge(['status_sesudah' => $this->statusSesudah]);
+        }
     }
 }

@@ -11,7 +11,7 @@ class StoreOperatorRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,16 @@ class StoreOperatorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nip' => 'required|integer|unique:operators,nip',
+            'nik' => 'required|integer|unique:operators,nik',
+            'nama' => 'required|string|max:255',
+            'jk' => 'required|in:laki-laki,perempuan',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        // Tidak perlu prepareForValidation karena field name sudah sama
+        // dengan database column name
     }
 }

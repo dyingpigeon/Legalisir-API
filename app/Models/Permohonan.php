@@ -26,12 +26,12 @@ class Permohonan extends Model
 
     // Konstanta status
     const STATUS_DIMULAI = 1;
-    const STATUS_DITERIMA = 2;
-    const STATUS_VERIFIKASI = 3;
-    const STATUS_DITANDATANGANI = 4;
-    const STATUS_SIAP_DIAMBIL = 5;
-    const STATUS_SUDAH_DIAMBIL = 6;  // Diubah dari DITOLAK
-    const DITOLAK = 7;               // DITOLAK dipindah ke status 7
+    // const STATUS_DITERIMA = 2;
+    const STATUS_VERIFIKASI = 2;
+    const STATUS_DITANDATANGANI = 3;
+    const STATUS_SIAP_DIAMBIL = 4;
+    const STATUS_SUDAH_DIAMBIL = 5;  // Diubah dari DITOLAK
+    const DITOLAK = 6;               // DITOLAK dipindah ke status 7
 
     // Relasi dengan user
     public function user()
@@ -56,7 +56,7 @@ class Permohonan extends Model
     {
         return match ($this->status) {
             self::STATUS_DIMULAI => 'Dimulai',
-            self::STATUS_DITERIMA => 'Diterima',
+            // self::STATUS_DITERIMA => 'Diterima',
             self::STATUS_VERIFIKASI => 'Verifikasi',
             self::STATUS_DITANDATANGANI => 'Ditandatangani',
             self::STATUS_SIAP_DIAMBIL => 'Siap Diambil',
@@ -70,7 +70,7 @@ class Permohonan extends Model
     {
         return match ($status) {
             self::STATUS_DIMULAI => 'Dimulai',
-            self::STATUS_DITERIMA => 'Diterima',
+            // self::STATUS_DITERIMA => 'Diterima',
             self::STATUS_VERIFIKASI => 'Verifikasi',
             self::STATUS_DITANDATANGANI => 'Ditandatangani',
             self::STATUS_SIAP_DIAMBIL => 'Siap Diambil',

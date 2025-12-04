@@ -13,7 +13,7 @@ class ApprovalController extends Controller
     /**
      * Approve permohonan oleh operator (status 1 -> 2)
      */
-    public function approveByOperator(Request $request, $id)
+    public function verifiedByOperator(Request $request, $id)
     {
         $request->validate([
             'keterangan' => 'nullable|string|max:500'
@@ -25,7 +25,7 @@ class ApprovalController extends Controller
         if (Auth::user()->role !== 'operator') {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized. Hanya operator yang dapat melakukan approval ini.'
+                'message' => 'Unauthorized. Hanya operator yang dapat melakukan verifikasi ini.'
             ], 403);
         }
 
@@ -33,14 +33,14 @@ class ApprovalController extends Controller
         if ($permohonan->status !== Permohonan::STATUS_DIMULAI) {
             return response()->json([
                 'success' => false,
-                'message' => 'Permohonan tidak dapat diapprove. Status harus "Dimulai".'
+                'message' => 'Permohonan tidak dapat diverifikasi. Status harus "Diterima".'
             ], 400);
         }
 
         return DB::transaction(function () use ($permohonan, $request) {
             // Update status permohonan
             $permohonan->update([
-                'status' => Permohonan::STATUS_DITERIMA
+                'status' => Permohonan::STATUS_VERIFIKASI
             ]);
 
             // Simpan riwayat
@@ -48,7 +48,7 @@ class ApprovalController extends Controller
                 'permohonan_id' => $permohonan->id,
                 'user_id' => Auth::id(),
                 'status_sebelum' => Permohonan::STATUS_DIMULAI,
-                'status_sesudah' => Permohonan::STATUS_DITERIMA,
+                'status_sesudah' => Permohonan::STATUS_VERIFIKASI,
                 'keterangan' => $request->keterangan ?? 'Diterima oleh Operator'
             ]);
 
@@ -68,7 +68,7 @@ class ApprovalController extends Controller
     /**
      * Approve permohonan oleh wadir1 (status 2 -> 3)
      */
-    public function approveByWadir(Request $request, $id)
+    public function signedByWadir(Request $request, $id)
     {
         $request->validate([
             'keterangan' => 'nullable|string|max:500'
@@ -80,31 +80,31 @@ class ApprovalController extends Controller
         if (Auth::user()->role !== 'wadir1') {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized. Hanya wadir yang dapat melakukan approval ini.'
+                'message' => 'Unauthorized. Hanya wadir yang dapat melakukan ttd ini.'
             ], 403);
         }
 
         // Validasi status
-        if ($permohonan->status !== Permohonan::STATUS_DITERIMA) {
+        if ($permohonan->status !== Permohonan::STATUS_VERIFIKASI) {
             return response()->json([
                 'success' => false,
-                'message' => 'Permohonan tidak dapat diverifikasi. Status harus "Diterima" oleh operator terlebih dahulu.'
+                'message' => 'Permohonan tidak dapat ditandatangan. Status harus "Diverifikasi" oleh operator terlebih dahulu.'
             ], 400);
         }
 
         return DB::transaction(function () use ($permohonan, $request) {
             // Update status permohonan
             $permohonan->update([
-                'status' => Permohonan::STATUS_VERIFIKASI
+                'status' => Permohonan::STATUS_DITANDATANGANI
             ]);
 
             // Simpan riwayat
             RiwayatStatus::create([
                 'permohonan_id' => $permohonan->id,
                 'user_id' => Auth::id(),
-                'status_sebelum' => Permohonan::STATUS_DITERIMA,
-                'status_sesudah' => Permohonan::STATUS_VERIFIKASI,
-                'keterangan' => $request->keterangan ?? 'Diverifikasi oleh Wadir'
+                'status_sebelum' => Permohonan::STATUS_VERIFIKASI,
+                'status_sesudah' => Permohonan::STATUS_DITANDATANGANI,
+                'keterangan' => $request->keterangan ?? 'DiTTD oleh Wadir'
             ]);
 
             return response()->json([
@@ -123,57 +123,57 @@ class ApprovalController extends Controller
     /**
      * Update status ke ditandatangani (status 3 -> 4)
      */
-    public function markAsSigned(Request $request, $id)
-    {
-        $request->validate([
-            'keterangan' => 'nullable|string|max:500'
-        ]);
+    // public function markAsSigned(Request $request, $id)
+    // {
+    //     $request->validate([
+    //         'keterangan' => 'nullable|string|max:500'
+    //     ]);
 
-        $permohonan = Permohonan::findOrFail($id);
+    //     $permohonan = Permohonan::findOrFail($id);
         
-        // Cek role yang diizinkan
-        if (!in_array(Auth::user()->role, ['operator', 'wadir1'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized.'
-            ], 403);
-        }
+    //     // Cek role yang diizinkan
+    //     if (!in_array(Auth::user()->role, ['operator', 'wadir1'])) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Unauthorized.'
+    //         ], 403);
+    //     }
 
-        // Validasi status
-        if ($permohonan->status !== Permohonan::STATUS_VERIFIKASI) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Permohonan tidak dapat ditandatangani. Status harus "Verifikasi" terlebih dahulu.'
-            ], 400);
-        }
+    //     // Validasi status
+    //     if ($permohonan->status !== Permohonan::STATUS_VERIFIKASI) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Permohonan tidak dapat ditandatangani. Status harus "Verifikasi" terlebih dahulu.'
+    //         ], 400);
+    //     }
 
-        return DB::transaction(function () use ($permohonan, $request) {
-            // Update status permohonan
-            $permohonan->update([
-                'status' => Permohonan::STATUS_DITANDATANGANI
-            ]);
+    //     return DB::transaction(function () use ($permohonan, $request) {
+    //         // Update status permohonan
+    //         $permohonan->update([
+    //             'status' => Permohonan::STATUS_DITANDATANGANI
+    //         ]);
 
-            // Simpan riwayat
-            RiwayatStatus::create([
-                'permohonan_id' => $permohonan->id,
-                'user_id' => Auth::id(),
-                'status_sebelum' => Permohonan::STATUS_VERIFIKASI,
-                'status_sesudah' => Permohonan::STATUS_DITANDATANGANI,
-                'keterangan' => $request->keterangan ?? 'Telah Ditandatangani'
-            ]);
+    //         // Simpan riwayat
+    //         RiwayatStatus::create([
+    //             'permohonan_id' => $permohonan->id,
+    //             'user_id' => Auth::id(),
+    //             'status_sebelum' => Permohonan::STATUS_VERIFIKASI,
+    //             'status_sesudah' => Permohonan::STATUS_DITANDATANGANI,
+    //             'keterangan' => $request->keterangan ?? 'Telah Ditandatangani'
+    //         ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Permohonan berhasil ditandatangani',
-                'data' => [
-                    'permohonan' => $permohonan->load('user', 'riwayatStatus'),
-                    'status_sebelum' => 'Verifikasi',
-                    'status_sesudah' => 'Ditandatangani',
-                    'updated_by' => Auth::user()->name
-                ]
-            ]);
-        });
-    }
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Permohonan berhasil ditandatangani',
+    //             'data' => [
+    //                 'permohonan' => $permohonan->load('user', 'riwayatStatus'),
+    //                 'status_sebelum' => 'Verifikasi',
+    //                 'status_sesudah' => 'Ditandatangani',
+    //                 'updated_by' => Auth::user()->name
+    //             ]
+    //         ]);
+    //     });
+    // }
 
     /**
      * Update status ke siap diambil (status 4 -> 5)
@@ -327,7 +327,7 @@ class ApprovalController extends Controller
         switch ($user->role) {
             case 'operator':
                 // Operator bisa melihat semua status kecuali yang baru dimulai
-                $query->where('status', '>=', Permohonan::STATUS_DITERIMA);
+                $query->where('status', '>=', Permohonan::STATUS_DIMULAI);
                 break;
                 
             case 'wadir1':
