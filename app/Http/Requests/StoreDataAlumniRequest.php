@@ -33,7 +33,7 @@ class StoreDataAlumniRequest extends FormRequest
             'tanggal_lahir' => 'required|date',
             'alamat' => 'required|string',
             'hp' => 'required|string|max:20',
-            'nomor_Ijazah_Elektronik' => 'required|string',
+            'nomor_ijazah' => 'required|string',
             'is_active' => 'sometimes|boolean',
         ];
     }

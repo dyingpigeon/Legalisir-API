@@ -56,11 +56,10 @@ class Permohonan extends Model
     {
         return match ($this->status) {
             self::STATUS_DIMULAI => 'Dimulai',
-            // self::STATUS_DITERIMA => 'Diterima',
             self::STATUS_VERIFIKASI => 'Verifikasi',
             self::STATUS_DITANDATANGANI => 'Ditandatangani',
             self::STATUS_SIAP_DIAMBIL => 'Siap Diambil',
-            self::STATUS_SUDAH_DIAMBIL => 'Sudah Diambil',  // Diubah
+            self::STATUS_SUDAH_DIAMBIL => 'Sudah Diambil',
             self::DITOLAK => 'Ditolak',
             default => 'Tidak Diketahui'
         };
@@ -70,11 +69,10 @@ class Permohonan extends Model
     {
         return match ($status) {
             self::STATUS_DIMULAI => 'Dimulai',
-            // self::STATUS_DITERIMA => 'Diterima',
             self::STATUS_VERIFIKASI => 'Verifikasi',
             self::STATUS_DITANDATANGANI => 'Ditandatangani',
             self::STATUS_SIAP_DIAMBIL => 'Siap Diambil',
-            self::STATUS_SUDAH_DIAMBIL => 'Sudah Diambil',  // Diubah
+            self::STATUS_SUDAH_DIAMBIL => 'Sudah Diambil',
             self::DITOLAK => 'Ditolak',
             default => 'Tidak Diketahui'
         };

@@ -27,7 +27,7 @@ class DataAlumniResource extends JsonResource
             'tanggalLahir' => $this->tanggal_lahir,
             'alamat' => $this->alamat,
             'hp' => $this->hp,
-            'nomorIjazahElektronik' => $this->nomor_Ijazah_Elektronik,
+            'nomorIjazah' => $this->nomor_ijazah,
             'isActive' => $this->is_active,
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,

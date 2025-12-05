@@ -24,7 +24,7 @@ return new class extends Migration
             $table->date('tanggal_lahir');
             $table->text('alamat');
             $table->string('hp', 20);
-            $table->string('nomor_Ijazah_Elektronik');
+            $table->string('nomor_ijazah');
             $table->boolean('is_active')->default(false);
             $table->timestamps();
             

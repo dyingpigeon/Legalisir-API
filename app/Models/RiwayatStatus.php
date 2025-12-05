@@ -36,10 +36,10 @@ class RiwayatStatus extends Model
 
         return match ($this->status_sebelum) {
             Permohonan::STATUS_DIMULAI => 'Dimulai',
-            Permohonan::STATUS_DITERIMA => 'Diterima',
             Permohonan::STATUS_VERIFIKASI => 'Verifikasi',
             Permohonan::STATUS_DITANDATANGANI => 'Ditandatangani',
             Permohonan::STATUS_SIAP_DIAMBIL => 'Siap Diambil',
+            Permohonan::STATUS_SUDAH_DIAMBIL => 'Sudah Diambil',
             Permohonan::DITOLAK => 'Ditolak',
             default => 'Tidak Diketahui'
         };
@@ -49,10 +49,10 @@ class RiwayatStatus extends Model
     {
         return match ($this->status_sesudah) {
             Permohonan::STATUS_DIMULAI => 'Dimulai',
-            Permohonan::STATUS_DITERIMA => 'Diterima',
             Permohonan::STATUS_VERIFIKASI => 'Verifikasi',
             Permohonan::STATUS_DITANDATANGANI => 'Ditandatangani',
             Permohonan::STATUS_SIAP_DIAMBIL => 'Siap Diambil',
+            Permohonan::STATUS_SUDAH_DIAMBIL => 'Sudah Diambil',
             Permohonan::DITOLAK => 'Ditolak',
             default => 'Tidak Diketahui'
         };

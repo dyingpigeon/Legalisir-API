@@ -53,10 +53,10 @@ class DatabaseSeeder extends Seeder
 
         // User Biasa
         User::factory()->regular()->create([
-            'name' => 'User Biasa',
-            'username' => 85566778899,
-            'nik' => 5566778899001122,
-            'email' => 'user@example.com',
+            'name' => 'Farhan',
+            'username' => 8403095460,
+            'nik' => 7152113287658775,
+            'email' => 'the.farhanad123@gmail.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
             'verification_token' => null,
@@ -114,8 +114,8 @@ class DatabaseSeeder extends Seeder
         DataAlumni::factory()->create([
             'email' => 'the.farhanad123@gmail.com',
             'nama_Ibu' => 'bawadehel',
-            'nim' => '8403095460',
-            'nik' => '7152113287658775',
+            'nim' => 8403095460,
+            'nik' => 7152113287658775,
             'nama' => 'Farhan', // tambahkan nama karena required
             'jk' => 'laki-laki', // tambahkan jk karena required
             'agama' => 'Islam', // tambahkan agama karena required
@@ -123,7 +123,23 @@ class DatabaseSeeder extends Seeder
             'tanggal_lahir' => '1990-01-01', // tambahkan tanggal_lahir karena required
             'alamat' => 'Jl. Contoh Alamat', // tambahkan alamat karena required
             'hp' => '081234567890', // tambahkan hp karena required
-            'nomor_Ijazah_Elektronik' => 'IJZ-8403095460', // tambahkan nomor ijazah karena required
+            'nomor_ijazah' => '1234567890123456', // tambahkan nomor ijazah karena required
+            'is_active' => true, // tambahkan is_active karena required
+        ]);
+
+        DataAlumni::factory()->create([
+            'email' => 'faradri185@gmail.com',
+            'nama_Ibu' => 'bawadehel',
+            'nim' => 8403095462,
+            'nik' => 7152113287658745,
+            'nama' => 'Farhan1', // tambahkan nama karena required
+            'jk' => 'laki-laki', // tambahkan jk karena required
+            'agama' => 'Islam', // tambahkan agama karena required
+            'tempat_lahir' => 'Jakarta', // tambahkan tempat_lahir karena required
+            'tanggal_lahir' => '1990-01-01', // tambahkan tanggal_lahir karena required
+            'alamat' => 'Jl. Contoh Alamat', // tambahkan alamat karena required
+            'hp' => '081234567892', // tambahkan hp karena required
+            'nomor_ijazah' => ' ', // tambahkan nomor ijazah karena required
             'is_active' => true, // tambahkan is_active karena required
         ]);
 

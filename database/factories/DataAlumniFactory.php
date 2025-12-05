@@ -23,7 +23,7 @@ class DataAlumniFactory extends Factory
             'tanggal_lahir' => fake()->dateTimeBetween('-40 years', '-20 years')->format('Y-m-d'),
             'alamat' => fake()->address(),
             'hp' => fake()->numerify('08##########'),
-            'nomor_Ijazah_Elektronik' => fake()->unique()->bothify('IJZ-##########'),
+            'nomor_ijazah' => fake()->unique()->bothify('IJZ-##########'),
             'is_active' => fake()->boolean(0), // 80% chance true
         ];
     }

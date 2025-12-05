@@ -23,7 +23,7 @@ class DataAlumni extends Model
         'tanggal_lahir',
         'alamat',
         'hp',
-        'nomor_Ijazah_Elektronik',
+        'nomor_ijazah',
         'is_active'
     ];
 

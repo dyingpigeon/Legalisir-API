@@ -43,7 +43,7 @@ class UpdateDataAlumniRequest extends FormRequest
                 'tanggal_lahir' => ['required', 'date'],
                 'alamat' => ['required', 'string'],
                 'hp' => ['required', 'string', 'max:20'],
-                'nomor_Ijazah_Elektronik' => ['required', 'string'],
+                'nomor_ijazah' => ['required', 'string'],
                 'is_active' => ['required', 'boolean'],
             ];
         } else {
@@ -59,7 +59,7 @@ class UpdateDataAlumniRequest extends FormRequest
                 'tanggal_lahir' => ['sometimes', 'date'],
                 'alamat' => ['sometimes', 'string'],
                 'hp' => ['sometimes', 'string', 'max:20'],
-                'nomor_Ijazah_Elektronik' => ['sometimes', 'string'],
+                'nomor_ijazah' => ['sometimes', 'string'],
                 'is_active' => ['sometimes', 'boolean'],
             ];
         }
