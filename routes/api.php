@@ -4,6 +4,7 @@ use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\SignedRegisterController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\PermohonanController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,15 +35,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroyMobile'])->name('logout');
 
     // Approval routes
-    Route::prefix('approval')->group(function () {
+    Route::prefix('permohonan')->group(function () {
         Route::post('/operator/{id}', [ApprovalController::class, 'verifiedByOperator']);
         Route::post('/wadir/{id}', [ApprovalController::class, 'signedByWadir']);
         // Route::post('/sign/{id}', [ApprovalController::class, 'markAsSigned']);
         Route::post('/ready/{id}', [ApprovalController::class, 'markAsReady']);
         Route::post('/reject/{id}', [ApprovalController::class, 'reject']);
         Route::get('/riwayat/{permohonanId}', [ApprovalController::class, 'getRiwayat']);
-        Route::get('/permohonan', [ApprovalController::class, 'getPermohonanByStatus']);
+        Route::get('/show', [ApprovalController::class, 'getPermohonanByStatus']);
     });
+
 
     Route::post('/permohonan-debug', function (Request $request) {
         return response()->json([
@@ -51,6 +53,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'auth' => auth()->check()
         ]);
     });
+
+    Route::post('/create', [PermohonanController::class, 'buatPermohonan']);
+
 
     // API Resources
     Route::apiResource('/permohonan', \App\Http\Controllers\PermohonanController::class);

@@ -26,8 +26,7 @@ class StorePermohonanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 'nomorIjazah' => 'required|integer',
-            'nomorIjazah' => [
+            'nomor_ijazah' => [
                 'required',
                 'string',
                 'min:10', // sesuaikan dengan format nomor ijazah
@@ -40,47 +39,81 @@ class StorePermohonanRequest extends FormRequest
                     $alumni = DataAlumni::where('nomor_ijazah', $value)->first();
                     $ijazah = Ijazah::where('nomor_ijazah', $value)->first();
 
-                    // Validasi 1: Nomor ijazah harus ada
-                    if ($ijazah->nim !== $user->username) {
+                    // Validasi 1: Data ijazah harus ada
+                    if (!$ijazah) {
+                        $fail('Nomor ijazah tidak ditemukan dalam data ijazah.');
+                        return;
+                    }
+
+                    // Validasi 2: Data alumni harus ada
+                    if (!$alumni) {
                         $fail('Nomor ijazah tidak ditemukan dalam data alumni.');
                         return;
                     }
 
-                    // Validasi 2: NIK harus cocok
+                    // Validasi 3: NIK harus cocok
                     if ($alumni->nik !== $user->nik) {
                         $fail('Nomor ijazah ini bukan milik Anda berdasarkan data NIK.');
                         return;
                     }
 
-                    // Validasi 3: NIM harus cocok
+                    // Validasi 4: NIM harus cocok
                     if ($alumni->nim !== $user->username) {
                         $fail('Nomor ijazah ini bukan milik Anda berdasarkan data NIM.');
                         return;
                     }
+
+                    // Validasi 5: NIM di tabel ijazah harus cocok
+                    if ($ijazah->nim !== $user->username) {
+                        $fail('Nomor ijazah ini bukan milik Anda berdasarkan data NIM di tabel ijazah.');
+                        return;
+                    }
                 }
             ],
-            'jumlahLembar' => 'required|integer|min:1',
+            'jumlah_lembar' => 'required|integer|min:1',
             'keperluan' => 'required|string',
-            'file' => 'required|string',
-            // Hapus userId dan username karena akan diambil dari user yang login
-            // 'userId' => 'required|integer|exists:users,id',
-            // 'username' => 'required|integer',
-            // 'status' => 'sometimes|integer|min:1|max:5',
-            'tanggalDiambil' => 'sometimes|nullable|date',
+            'file' => ['required', 'file', 'mimes:pdf,doc,docx,zip,rar,txt,jpg,jpeg,png', 'max:10240'],
+            'tanggal_diambil' => 'sometimes|nullable|date',
         ];
     }
 
-    protected function prepareForValidation()
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
     {
-        $this->merge([
-            // Ambil user_id dan username dari user yang sedang login
-            'user_id' => Auth::id(),
-            'username' => Auth::user()->username,
-            'nomor_ijazah' => $this->nomorIjazah,
-            'jumlah_lembar' => $this->jumlahLembar,
-            'tanggal_diambil' => $this->tanggalDiambil,
-            'status' => 1,
-        ]);
+        return [
+            'nomor_ijazah' => 'nomor ijazah',
+            'jumlah_lembar' => 'jumlah lembar',
+            'tanggal_diambil' => 'tanggal diambil',
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'nomor_ijazah.required' => 'Nomor ijazah wajib diisi.',
+            'nomor_ijazah.string' => 'Nomor ijazah harus berupa teks.',
+            'nomor_ijazah.min' => 'Nomor ijazah minimal 10 karakter.',
+            'nomor_ijazah.max' => 'Nomor ijazah maksimal 50 karakter.',
+            'jumlah_lembar.required' => 'Jumlah lembar wajib diisi.',
+            'jumlah_lembar.integer' => 'Jumlah lembar harus berupa angka.',
+            'jumlah_lembar.min' => 'Jumlah lembar minimal 1.',
+            'keperluan.required' => 'Keperluan wajib diisi.',
+            'keperluan.string' => 'Keperluan harus berupa teks.',
+            'file.required' => 'File wajib diunggah.',
+            'file.file' => 'File harus berupa berkas.',
+            'file.mimes' => 'File harus berupa PDF, DOC, DOCX, ZIP, RAR, TXT, JPG, JPEG, atau PNG.',
+            'file.max' => 'Ukuran file maksimal 10MB.',
+            'tanggal_diambil.date' => 'Tanggal diambil harus berupa tanggal yang valid.',
+        ];
     }
 
     /**

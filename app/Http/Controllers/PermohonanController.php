@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Permohonan;
+use Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePermohonanRequest;
@@ -75,6 +76,34 @@ class PermohonanController extends Controller
     public function store(StorePermohonanRequest $request)
     {
         return new PermohonanResource(Permohonan::create($request->all()));
+    }
+
+    public function buatPermohonan(UpdatePermohonanRequest $request)
+    {
+        $data = $request->validated();
+        $data['user_id'] = Auth::id();
+        $data['username'] = Auth::user()->username;
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $extension = $file->getClientOriginalExtension();
+            $timestamp = time();
+            $data2 = Auth::user()->username;
+
+            $filename = 'Permohonan_milik_' . $data2 . '_Nomor_ijazah_' . $data['nomor_ijazah'] . '_' . $timestamp . '.' . $extension;
+
+            $path = $file->storeAs('Ijazah_Pemohon', $filename, 'public');
+
+            // Simpan ke kedua kolom jika perlu
+            $data['file_url'] = $path;
+            $data['file'] = $path; // atau $data['file'] = $filename;
+
+            // JANGAN di-unset
+            // unset($data['file']);
+        }
+
+        $permohonan = Permohonan::create($data);
+        return new PermohonanResource($permohonan);
     }
 
     /**
