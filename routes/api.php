@@ -36,10 +36,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Approval routes
     Route::prefix('permohonan')->group(function () {
+        Route::post('/create', [PermohonanController::class, 'buatPermohonan']);
         Route::post('/operator/{id}', [ApprovalController::class, 'verifiedByOperator']);
         Route::post('/wadir/{id}', [ApprovalController::class, 'signedByWadir']);
-        // Route::post('/sign/{id}', [ApprovalController::class, 'markAsSigned']);
         Route::post('/ready/{id}', [ApprovalController::class, 'markAsReady']);
+        Route::post('/done/{id}', [ApprovalController::class, 'markAsDone']);
         Route::post('/reject/{id}', [ApprovalController::class, 'reject']);
         Route::get('/riwayat/{permohonanId}', [ApprovalController::class, 'getRiwayat']);
         Route::get('/show', [ApprovalController::class, 'getPermohonanByStatus']);
@@ -53,9 +54,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'auth' => auth()->check()
         ]);
     });
-
-    Route::post('/create', [PermohonanController::class, 'buatPermohonan']);
-
 
     // API Resources
     Route::apiResource('/permohonan', \App\Http\Controllers\PermohonanController::class);

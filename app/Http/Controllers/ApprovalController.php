@@ -20,7 +20,7 @@ class ApprovalController extends Controller
         ]);
 
         $permohonan = Permohonan::findOrFail($id);
-        
+
         // Cek authorization
         if (Auth::user()->role !== 'operator') {
             return response()->json([
@@ -66,7 +66,7 @@ class ApprovalController extends Controller
     }
 
     /**
-     * Approve permohonan oleh wadir1 (status 2 -> 3)
+     * tandatangan oleh wadir1 (status 2 -> 3)
      */
     public function signedByWadir(Request $request, $id)
     {
@@ -75,7 +75,7 @@ class ApprovalController extends Controller
         ]);
 
         $permohonan = Permohonan::findOrFail($id);
-        
+
         // Cek authorization
         if (Auth::user()->role !== 'wadir1') {
             return response()->json([
@@ -130,7 +130,7 @@ class ApprovalController extends Controller
     //     ]);
 
     //     $permohonan = Permohonan::findOrFail($id);
-        
+
     //     // Cek role yang diizinkan
     //     if (!in_array(Auth::user()->role, ['operator', 'wadir1'])) {
     //         return response()->json([
@@ -176,7 +176,7 @@ class ApprovalController extends Controller
     // }
 
     /**
-     * Update status ke siap diambil (status 4 -> 5)
+     * Update status ke siap diambil (status 3 -> 4)
      */
     public function markAsReady(Request $request, $id)
     {
@@ -185,7 +185,7 @@ class ApprovalController extends Controller
         ]);
 
         $permohonan = Permohonan::findOrFail($id);
-        
+
         // Cek authorization
         if (Auth::user()->role !== 'operator') {
             return response()->json([
@@ -231,6 +231,65 @@ class ApprovalController extends Controller
     }
 
     /**
+     * Permohonan sudah diambil
+     */
+
+    public function markAsDone(Request $request, $id)
+    {
+        $request->validate([
+            'keterangan' => 'nullable|string|max:500'
+        ]);
+
+        $permohonan = Permohonan::findOrFail($id);
+
+        // Cek authorization
+        $allowedRoles = ['operator', 'admin']; // Sesuaikan dengan kebutuhan
+
+        if (!in_array(Auth::user()->role, $allowedRoles)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized. Hanya operator yang dapat menandai sudah diambil.'
+            ], 403);
+        }
+
+
+        // Validasi status
+        if ($permohonan->status !== Permohonan::STATUS_SIAP_DIAMBIL) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Permohonan tidak dapat ditandai siap diambil. Status harus "Ditandatangani" terlebih dahulu.'
+            ], 400);
+        }
+
+        return DB::transaction(function () use ($permohonan, $request) {
+            // Update status permohonan
+            $permohonan->update([
+                'status' => Permohonan::STATUS_SUDAH_DIAMBIL
+            ]);
+
+            // Simpan riwayat
+            RiwayatStatus::create([
+                'permohonan_id' => $permohonan->id,
+                'user_id' => Auth::id(),
+                'status_sebelum' => Permohonan::STATUS_SIAP_DIAMBIL,
+                'status_sesudah' => Permohonan::STATUS_SUDAH_DIAMBIL,
+                'keterangan' => $request->keterangan ?? 'sudah Diambil'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permohonan sudah diambil',
+                'data' => [
+                    'permohonan' => $permohonan->load('user', 'riwayatStatus'),
+                    'status_sebelum' => 'Ditandatangani',
+                    'status_sesudah' => 'Siap Diambil',
+                    'updated_by' => Auth::user()->name
+                ]
+            ]);
+        });
+    }
+
+    /**
      * Tolak permohonan (status apapun -> 6)
      */
     public function reject(Request $request, $id)
@@ -240,7 +299,7 @@ class ApprovalController extends Controller
         ]);
 
         $permohonan = Permohonan::findOrFail($id);
-        
+
         // Cek authorization
         if (!in_array(Auth::user()->role, ['operator', 'wadir1'])) {
             return response()->json([
@@ -259,7 +318,7 @@ class ApprovalController extends Controller
 
         return DB::transaction(function () use ($permohonan, $request) {
             $statusSebelum = $permohonan->status;
-            
+
             // Update status permohonan
             $permohonan->update([
                 'status' => Permohonan::DITOLAK
@@ -294,10 +353,12 @@ class ApprovalController extends Controller
     public function getRiwayat($permohonanId)
     {
         $permohonan = Permohonan::findOrFail($permohonanId);
-        
-        $riwayat = RiwayatStatus::with(['user' => function($query) {
+
+        $riwayat = RiwayatStatus::with([
+            'user' => function ($query) {
                 $query->select('id', 'name', 'role');
-            }])
+            }
+        ])
             ->where('permohonan_id', $permohonanId)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -318,10 +379,12 @@ class ApprovalController extends Controller
     {
         $user = Auth::user();
         $status = $request->get('status');
-        
-        $query = Permohonan::with(['user' => function($query) {
-            $query->select('id', 'name', 'email');
-        }]);
+
+        $query = Permohonan::with([
+            'user' => function ($query) {
+                $query->select('id', 'name', 'email');
+            }
+        ]);
 
         // Filter berdasarkan role
         switch ($user->role) {
@@ -329,20 +392,20 @@ class ApprovalController extends Controller
                 // Operator bisa melihat semua status kecuali yang baru dimulai
                 $query->where('status', '>=', Permohonan::STATUS_DIMULAI);
                 break;
-                
+
             case 'wadir1':
                 // Wadir hanya melihat status verifikasi dan yang sudah ditandatangani
                 $query->whereIn('status', [
-                    Permohonan::STATUS_VERIFIKASI, 
+                    Permohonan::STATUS_VERIFIKASI,
                     Permohonan::STATUS_DITANDATANGANI
                 ]);
                 break;
-                
+
             case 'user':
                 // User hanya melihat permohonan mereka sendiri
                 $query->where('user_id', $user->id);
                 break;
-                
+
             case 'superadmin':
                 // Superadmin bisa melihat semua
                 break;
@@ -354,7 +417,7 @@ class ApprovalController extends Controller
         }
 
         $permohonans = $query->orderBy('created_at', 'desc')
-                            ->paginate(10);
+            ->paginate(10);
 
         return response()->json([
             'success' => true,
