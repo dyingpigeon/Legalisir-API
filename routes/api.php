@@ -46,7 +46,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/show', [ApprovalController::class, 'getPermohonanByStatus']);
     });
 
-
     Route::post('/permohonan-debug', function (Request $request) {
         return response()->json([
             'message' => 'Debug route works',
