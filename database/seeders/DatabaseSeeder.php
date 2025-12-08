@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Ijazah;
 use App\Models\User;
 use App\Models\DataAlumni;
 use Hash;
@@ -125,6 +126,12 @@ class DatabaseSeeder extends Seeder
             'hp' => '081234567890', // tambahkan hp karena required
             'nomor_ijazah' => '1234567890123456', // tambahkan nomor ijazah karena required
             'is_active' => true, // tambahkan is_active karena required
+        ]);
+
+        Ijazah::factory()->create([
+            'nomor_ijazah' => '1234567890123456',
+            'nim' => 8403095460,
+            'path_file' => 'template_ijazah/1234567890123456.pdf'
         ]);
 
         DataAlumni::factory()->create([
