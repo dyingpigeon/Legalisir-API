@@ -41,6 +41,7 @@ class RiwayatStatus extends Model
             Permohonan::STATUS_SIAP_DIAMBIL => 'Siap Diambil',
             Permohonan::STATUS_SUDAH_DIAMBIL => 'Sudah Diambil',
             Permohonan::DITOLAK => 'Ditolak',
+            Permohonan::DIBATALKAN => 'Dibatalkan',
             default => 'Tidak Diketahui'
         };
     }
@@ -54,6 +55,7 @@ class RiwayatStatus extends Model
             Permohonan::STATUS_SIAP_DIAMBIL => 'Siap Diambil',
             Permohonan::STATUS_SUDAH_DIAMBIL => 'Sudah Diambil',
             Permohonan::DITOLAK => 'Ditolak',
+            Permohonan::DIBATALKAN => 'Dibatalkan',
             default => 'Tidak Diketahui'
         };
     }

@@ -23,7 +23,7 @@ class PermohonanResource extends JsonResource
             'jumlahLembar' => $this->jumlah_lembar,
             'keperluan' => $this->keperluan,
             'file' => $this->file,
-            'file_url' => $this->file ? asset('storage/' . $this->file) : null,
+            'file_url' => $this->file ? asset('storage/Ijazah_Pemohon/' . $this->file) : null,
             'status' => $this->status,
             'statusText' => $this->getStatusText(), // Tambahkan teks status
             'tanggalDiambil' => $this->tanggal_diambil,

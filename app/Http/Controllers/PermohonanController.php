@@ -93,11 +93,11 @@ class PermohonanController extends Controller
 
             $filename = 'Permohonan_milik_' . $data2 . '_Nomor_ijazah_' . $data['nomor_ijazah'] . '_' . $timestamp . '.' . $extension;
 
-            $path = $file->storeAs('Ijazah_Pemohon', $filename, 'public');
+            $file->storeAs('Ijazah_Pemohon', $filename, 'public');
 
             // Simpan ke kedua kolom jika perlu
-            $data['file_url'] = $path;
-            $data['file'] = $path; // atau $data['file'] = $filename;
+            $data['file_url'] = $filename;
+            $data['file'] = $filename; // atau $data['file'] = $filename;
 
             // JANGAN di-unset
             // unset($data['file']);

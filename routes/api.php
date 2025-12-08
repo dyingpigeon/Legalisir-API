@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/ready/{id}', [ApprovalController::class, 'markAsReady']);
         Route::post('/done/{id}', [ApprovalController::class, 'markAsDone']);
         Route::post('/reject/{id}', [ApprovalController::class, 'reject']);
+        Route::post('/cancel/{id}', [ApprovalController::class, 'cancel']);
         Route::get('/riwayat/{permohonanId}', [ApprovalController::class, 'getRiwayat']);
         Route::get('/show', [ApprovalController::class, 'getPermohonanByStatus']);
     });

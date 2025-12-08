@@ -16,6 +16,7 @@ class Permohonan extends Model
         'jumlah_lembar',
         'keperluan',
         'file',
+        'file_ijazah_verified',
         'status',
         'tanggal_diambil'
     ];
@@ -31,7 +32,8 @@ class Permohonan extends Model
     const STATUS_DITANDATANGANI = 3;
     const STATUS_SIAP_DIAMBIL = 4;
     const STATUS_SUDAH_DIAMBIL = 5;  // Diubah dari DITOLAK
-    const DITOLAK = 6;               // DITOLAK dipindah ke status 7
+    const DITOLAK = 6;         // DITOLAK dipindah ke status 7
+    const DIBATALKAN = 7;         // DITOLAK dipindah ke status 7
 
     // Relasi dengan user
     public function user()
@@ -61,6 +63,7 @@ class Permohonan extends Model
             self::STATUS_SIAP_DIAMBIL => 'Siap Diambil',
             self::STATUS_SUDAH_DIAMBIL => 'Sudah Diambil',
             self::DITOLAK => 'Ditolak',
+            self::DIBATALKAN => 'Dibatalkan',
             default => 'Tidak Diketahui'
         };
     }
@@ -74,6 +77,7 @@ class Permohonan extends Model
             self::STATUS_SIAP_DIAMBIL => 'Siap Diambil',
             self::STATUS_SUDAH_DIAMBIL => 'Sudah Diambil',
             self::DITOLAK => 'Ditolak',
+            self::DIBATALKAN => 'Dibatalkan',
             default => 'Tidak Diketahui'
         };
     }
