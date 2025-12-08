@@ -83,6 +83,7 @@ class PermohonanController extends Controller
         $data = $request->validated();
         $data['user_id'] = Auth::id();
         $data['username'] = Auth::user()->username;
+        $data['status'] = 1;
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
