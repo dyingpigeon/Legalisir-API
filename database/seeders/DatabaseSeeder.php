@@ -103,6 +103,7 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
             'verification_token' => null,
             'verification_link_used_at' => now(),
+            
         ]);
 
         // Create some unverified users
