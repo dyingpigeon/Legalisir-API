@@ -14,7 +14,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 // Public routes (tanpa authentication)
 Route::middleware(['guest'])->group(function () {
-    Route::post('/login', [AuthenticatedSessionController::class, 'storeMobile'])->name('login');
+    // Route::post('/loginmobile', [AuthenticatedSessionController::class, 'storeMobile'])->name('login');
     Route::post('/registerwah', [SignedRegisterController::class, 'askForRegister'])->name('register');
 
     // Verify email - biasanya public karena diakses via link email
