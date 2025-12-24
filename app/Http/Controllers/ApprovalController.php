@@ -476,80 +476,80 @@ class ApprovalController extends Controller
     /**
      * Get riwayat approval untuk permohonan tertentu
      */
-    public function getRiwayat($permohonanId)
-    {
-        $permohonan = Permohonan::findOrFail($permohonanId);
+    // public function getRiwayat($permohonanId)
+    // {
+    //     $permohonan = Permohonan::findOrFail($permohonanId);
 
-        $riwayat = RiwayatStatus::with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'role');
-            }
-        ])
-            ->where('permohonan_id', $permohonanId)
-            ->orderBy('created_at', 'desc')
-            ->get();
+    //     $riwayat = RiwayatStatus::with([
+    //         'user' => function ($query) {
+    //             $query->select('id', 'name', 'role');
+    //         }
+    //     ])
+    //         ->where('permohonan_id', $permohonanId)
+    //         ->orderBy('created_at', 'desc')
+    //         ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'permohonan' => $permohonan,
-                'riwayat' => $riwayat
-            ]
-        ]);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         'data' => [
+    //             'permohonan' => $permohonan,
+    //             'riwayat' => $riwayat
+    //         ]
+    //     ]);
+    // }
 
-    /**
-     * Get permohonan berdasarkan status dan role user
-     */
-    public function getPermohonanByStatus(Request $request)
-    {
-        $user = Auth::user();
-        $status = $request->get('status');
+    // /**
+    //  * Get permohonan berdasarkan status dan role user
+    //  */
+    // public function getPermohonanByStatus(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     $status = $request->get('status');
 
-        $query = Permohonan::with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'email');
-            }
-        ]);
+    //     $query = Permohonan::with([
+    //         'user' => function ($query) {
+    //             $query->select('id', 'name', 'email');
+    //         }
+    //     ]);
 
-        // Filter berdasarkan role
-        switch ($user->role) {
-            case 'operator':
-                // Operator bisa melihat semua status kecuali yang baru dimulai
-                $query->where('status', '>=', Permohonan::STATUS_DIMULAI);
-                break;
+    //     // Filter berdasarkan role
+    //     switch ($user->role) {
+    //         case 'operator':
+    //             // Operator bisa melihat semua status kecuali yang baru dimulai
+    //             $query->where('status', '>=', Permohonan::STATUS_DIMULAI);
+    //             break;
 
-            case 'wadir1':
-                // Wadir hanya melihat status verifikasi dan yang sudah ditandatangani
-                $query->whereIn('status', [
-                    Permohonan::STATUS_VERIFIKASI,
-                    Permohonan::STATUS_DITANDATANGANI
-                ]);
-                break;
+    //         case 'wadir1':
+    //             // Wadir hanya melihat status verifikasi dan yang sudah ditandatangani
+    //             $query->whereIn('status', [
+    //                 Permohonan::STATUS_VERIFIKASI,
+    //                 Permohonan::STATUS_DITANDATANGANI
+    //             ]);
+    //             break;
 
-            case 'user':
-                // User hanya melihat permohonan mereka sendiri
-                $query->where('user_id', $user->id);
-                break;
+    //         case 'user':
+    //             // User hanya melihat permohonan mereka sendiri
+    //             $query->where('user_id', $user->id);
+    //             break;
 
-            case 'superadmin':
-                // Superadmin bisa melihat semua
-                break;
-        }
+    //         case 'superadmin':
+    //             // Superadmin bisa melihat semua
+    //             break;
+    //     }
 
-        // Filter by status jika ada
-        if ($status) {
-            $query->where('status', $status);
-        }
+    //     // Filter by status jika ada
+    //     if ($status) {
+    //         $query->where('status', $status);
+    //     }
 
-        $permohonans = $query->orderBy('created_at', 'desc')
-            ->paginate(10);
+    //     $permohonans = $query->orderBy('created_at', 'desc')
+    //         ->paginate(10);
 
-        return response()->json([
-            'success' => true,
-            'data' => $permohonans
-        ]);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         'data' => $permohonans
+    //     ]);
+    // }
 
     private function addVerificationStamp($sourcePath, $destinationPath)
     {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Permohonan;
+use App\Models\RiwayatStatus;
 use Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -137,5 +138,92 @@ class PermohonanController extends Controller
             'success' => true,
             'message' => 'Permohonan berhasil dihapus',
         ], 200);
+    }
+
+    public function getRiwayat($permohonanId)
+    {
+        $permohonan = Permohonan::findOrFail($permohonanId);
+
+        $riwayat = RiwayatStatus::with([
+            'user' => function ($query) {
+                $query->select('id', 'name', 'role');
+            }
+        ])
+            ->where('permohonan_id', $permohonanId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'permohonan' => $permohonan,
+                'riwayat' => $riwayat
+            ]
+        ]);
+    }
+
+    /**
+     * Get permohonan berdasarkan status dan role user
+     */
+    public function getPermohonanByStatus(Request $request)
+    {
+        $user = Auth::user();
+        $status = $request->get('status');
+
+        // Tambahkan parameter per_page dengan default 10
+        $perPage = $request->get('per_page', 10);
+
+        $query = Permohonan::with([
+            'user' => function ($query) {
+                $query->select('id', 'name', 'email');
+            }
+        ]);
+
+        // Filter berdasarkan role
+        switch ($user->role) {
+            case 'operator':
+                $query->where('status', '>=', Permohonan::STATUS_DIMULAI);
+                break;
+
+            case 'wadir1':
+                $query->whereIn('status', [
+                    Permohonan::STATUS_VERIFIKASI,
+                    Permohonan::STATUS_DITANDATANGANI
+                ]);
+                break;
+
+            case 'user':
+                $query->where('user_id', $user->id);
+                break;
+
+            case 'superadmin':
+                break;
+        }
+
+        // Filter by status jika ada
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        // Ganti 10 dengan $perPage
+        $permohonans = $query->orderBy('created_at', 'desc')
+            ->paginate($perPage); // ← Gunakan $perPage
+
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => $permohonans
+        // ]);
+        return response()->json([
+            'success' => true,
+            'data' => PermohonanResource::collection($permohonans),
+            'meta' => [
+                'current_page' => $permohonans->currentPage(),
+                'total' => $permohonans->total(),
+                'per_page' => $permohonans->perPage(),
+                'last_page' => $permohonans->lastPage(),
+                'from' => $permohonans->firstItem(),
+                'to' => $permohonans->lastItem()
+            ]
+        ]);
     }
 }

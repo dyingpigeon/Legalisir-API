@@ -68,6 +68,7 @@ class AuthenticatedSessionController extends Controller
             'refresh_token' => $refreshToken,
             'token_type' => 'Bearer',
             'expires_in' => 900, // 15 menit dalam detik
+            'logged' => time(),
             'refresh_expires_in' => $remember ? 2592000 : 604800 // 30 atau 7 hari
         ]);
     }
@@ -112,7 +113,9 @@ class AuthenticatedSessionController extends Controller
         $newAccessToken = $user->createToken(
             'access-token',
             ['*'],
-            now()->addMinutes(15)
+            // now()->addMinutes(15)
+            now()->addDays(30) // Reset refresh token expiry
+
         )->plainTextToken;
 
         $newRefreshToken = $user->createToken(
